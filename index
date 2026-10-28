@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Device Inventory</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f5;--sf:#fff;--ink:#16212e;--mut:#5b6b7c;--line:#d5dde5;--ac:#0b6e6e;--acs:#d9efee;--wn:#9a4a05;--wns:#fbead7;--dn:#b3261e;--dns:#fbe1de;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1720;--sf:#17212c;--ink:#e6edf3;--mut:#93a4b5;--line:#2a3846;--ac:#4cc2bd;--acs:#12373a;--wn:#f0a860;--wns:#3a2a14;--dn:#ff8f87;--dns:#3d1b19}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1720;--sf:#17212c;--ink:#e6edf3;--mut:#93a4b5;--line:#2a3846;--ac:#4cc2bd;--acs:#12373a;--wn:#f0a860;--wns:#3a2a14;--dn:#ff8f87;--dns:#3d1b19}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--sf);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.brand{font-weight:700;font-size:18px;letter-spacing:-.01em}
+nav{display:flex;gap:4px}
+nav button,.tabs button{background:none;border:0;color:var(--mut);font:inherit;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer}
+nav button.on,.tabs button.on{background:var(--acs);color:var(--ac)}
+#q{flex:1 1 280px;max-width:520px;margin-left:auto;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+main{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.02em}h2{font-size:16px;margin:28px 0 10px}
+.sub{color:var(--mut);margin:0 0 20px}
+.note{color:var(--mut);font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{background:var(--ac);color:var(--sf);border:1px solid var(--ac);padding:8px 14px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.btn.sec{background:var(--sf);color:var(--ink);border-color:var(--line)}
+.btn.dn{background:var(--sf);color:var(--dn);border-color:var(--dn)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.stat{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.stat b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}
+.stat span{color:var(--mut);font-size:13px}
+.stat.flag b{color:var(--wn)}
+.card{background:var(--sf);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:13px;color:var(--mut);font-weight:600}
+tr:last-child td{border-bottom:0}
+tbody tr[data-go]{cursor:pointer}tbody tr[data-go]:hover{background:var(--bg)}
+.lk{background:none;border:0;padding:0;color:var(--ac);font:inherit;font-weight:600;cursor:pointer;text-align:left}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--bg);color:var(--mut);border:1px solid var(--line)}
+.pill.ok{background:var(--acs);color:var(--ac);border-color:transparent}
+.pill.wn{background:var(--wns);color:var(--wn);border-color:transparent}
+.pill.dn{background:var(--dns);color:var(--dn);border-color:transparent}
+.tabs{display:flex;gap:4px;margin:0 0 14px}
+.chip{margin-left:8px;font-size:13px;color:var(--mut)}
+dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;margin:0}
+dl div{padding:12px 16px;border-bottom:1px solid var(--line)}
+dt{font-size:12px;color:var(--mut);font-weight:600}dd{margin:2px 0 0;overflow-wrap:anywhere}
+.pad{padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 16px}
+label{display:block;font-size:13px;font-weight:600;color:var(--mut)}
+input,select,textarea{width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sf);color:var(--ink);font:inherit;font-weight:400}
+label.ck{display:flex;gap:8px;align-items:center}label.ck input{width:auto;margin:0}
+.full{grid-column:1/-1}
+details.menu{position:relative}
+details.menu summary{list-style:none}details.menu summary::-webkit-details-marker{display:none}
+.panel{position:absolute;right:0;top:calc(100% + 6px);z-index:5;width:290px;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.empty{padding:36px 20px;text-align:center;color:var(--mut)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--sf);color:var(--ink);width:min(480px,92vw);padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:500;display:none;z-index:9}
+.warn{background:var(--wns);color:var(--wn);padding:8px 14px;border-radius:8px;margin-bottom:16px}
+.back{margin-bottom:12px}
+</style></head>
+<body>
+<header>
+  <div class="brand">Device Inventory</div>
+  <nav><button data-go="home">Overview</button><button data-go="devices">Devices</button><button data-go="employees">Employees</button></nav>
+  <input id="q" type="search" placeholder="Search serial, employee, computer name, or model" aria-label="Search">
+  <a id="usersLink" href="/users" hidden class="btn sec" style="text-decoration:none">Users</a>
+  <button id="signout" class="btn sec" type="button">Sign out</button>
+</header>
+<main id="m"></main>
+<input type="file" id="csv" accept=".csv,text/csv" hidden>
+<dialog id="ed"><form method="dialog" id="ef">
+  <h1 style="font-size:20px">Add employee</h1>
+  <div class="grid" style="margin-top:12px">
+    <label class="full">Full name<input name="name" autocomplete="off"></label>
+    <label class="full">Department<input name="dept" list="depts" autocomplete="off"></label>
+    <label class="full">Or paste several (one per line: Name, Department)<textarea name="bulk" rows="4"></textarea></label>
+  </div>
+  <datalist id="depts"></datalist>
+  <div class="row" style="margin-top:16px;justify-content:flex-end"><button type="button" class="btn sec" id="ecancel">Cancel</button><button type="submit" class="btn">Save employee</button></div>
+</form></dialog>
+<div id="toast" role="status"></div>
+<script>
+const STATUS=["Assigned","Unassigned","In Storage","Repair","Lost/Stolen","Retired"],TYPES=["Laptop","Mobile Phone","Other"],COMP=["Compliant","Non-compliant","In grace period","Not evaluated","Unknown"],COND=["New","Good","Fair","Poor","Damaged"];
+let E=[],D=[],V={n:"home"},Q="",ok=true,IMP=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const today=()=>new Date().toISOString().slice(0,10);
+const emp=id=>E.find(e=>e.id===id), en=id=>emp(id)?emp(id).name:"";
+const money=n=>n===""||n==null?"":"$"+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const fd=s=>s?new Date(s.length<=10?s+"T00:00":s).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}):"";
+const fdt=s=>s?new Date(s).toLocaleString(undefined,{year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"";
+function toast(t){const e=$("#toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display="none",2800)}
+const stPill=s=>`<span class="pill ${s==="Assigned"?"ok":s==="In Storage"||s==="Unassigned"?"":s==="Repair"?"wn":"dn"}">${esc(s)}</span>`;
+const coPill=c=>c?`<span class="pill ${c==="Compliant"?"ok":c==="Non-compliant"?"dn":c==="In grace period"?"wn":""}">${esc(c)}</span>`:"";
+const notIntune=d=>d.enrolled!=="Yes"&&d.status!=="Retired"&&d.status!=="Lost/Stolen";
+const FILT={storage:["In storage",d=>d.status==="In Storage"],replace:["Needing replacement",d=>d.replace===true],intune:["Not in Intune",notIntune]};
+
+async function persist(){
+  try{
+    const r=await fetch("/api/data",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({employees:E,devices:D})});
+    if(r.status===401){location="/login";return false}
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    ok=true;return true
+  }catch(e){ok=false;toast("Couldn’t save: "+e.message);return false}
+}
+async function put(col,id,data,merge){
+  const arr=col==="devices"?D:E,i=arr.findIndex(x=>x.id===id);
+  if(i>=0)arr[i]=merge?{...arr[i],...data}:{id,...data};else arr.push({id,...data});
+  const done=await persist();render();return done
+}
+
+let ready=false,force=false;
+function go(n,p){V={n,...p};window.scrollTo(0,0);force=true;render()}
+function render(){
+  if(!force&&(V.n==="add"||V.n==="edit")&&$("#df"))return;
+  force=false;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===V.n||(V.n==="detail"||V.n==="add"||V.n==="edit")&&b.dataset.go==="devices"||V.n==="emp"&&b.dataset.go==="employees"));
+  $("#depts").innerHTML=[...new Set(E.map(e=>e.dept).filter(Boolean))].map(d=>`<option value="${esc(d)}">`).join("");
+  const m=$("#m");
+  m.innerHTML=(ok||!ready?"":'<div class="warn">Can’t reach the server, so changes are not being saved. Start it with <b>node server.js</b> and open http://localhost:3000.</div>')+
+    (V.n==="search"?vSearch():V.n==="devices"?vDevices():V.n==="employees"?vEmployees():V.n==="emp"?vEmp():V.n==="detail"?vDetail():V.n==="add"||V.n==="edit"?vForm():vHome());
+}
+
+function devTable(list){
+  if(!list.length)return '<div class="empty">No devices to show here yet.</div>';
+  return `<div class="card scroll"><table><thead><tr><th>Device</th><th>Serial #</th><th>Assigned to</th><th>OS version</th><th>Status</th></tr></thead><tbody>`+
+  list.map(d=>`<tr data-go="detail:${d.id}"><td><button class="lk">${esc(d.name||"(unnamed)")}</button><div class="sub" style="margin:0;font-size:13px">${esc([d.type,d.model].filter(Boolean).join(" · "))}</div></td><td>${esc(d.serial)}</td><td>${esc(en(d.assignedTo))||'<span class="chip" style="margin:0">With IT</span>'}</td><td>${esc([d.os,d.osVer].filter(Boolean).join(" "))}</td><td>${stPill(d.status)}</td></tr>`).join("")+`</tbody></table></div>`;
+}
+
+function vHome(){
+  const a=D.filter(d=>d.assignedTo).length,t=(k,n,l,f,fl)=>`<button class="stat ${fl&&n?"flag":""}" data-go="devices:${f||"all"}"><b>${n}</b><span>${l}</span></button>`;
+  return `<h1>Overview</h1><p class="sub">${E.length} employee${E.length===1?"":"s"} on file</p>
+  <div class="row"><button class="btn" data-go="add">Log new device</button><button class="btn sec" data-act="newemp">Add employee</button></div>
+  <div class="stats">${t(0,D.length,"Total devices","all")}${t(0,a,"Assigned devices","assigned")}${t(0,D.length-a,"Unassigned devices","unassigned")}${t(0,D.filter(FILT.storage[1]).length,"Devices in storage","all:storage")}${t(0,D.filter(FILT.replace[1]).length,"Devices needing replacement","all:replace",1)}${t(0,D.filter(notIntune).length,"Devices not in Intune","all:intune",1)}</div>
+  ${D.length?"":'<div class="card empty">No devices yet. Import a CSV below, or add your employees first, then log each device and assign it.</div>'}
+  ${vImport()}`;
+}
+
+/* ---------- CSV import ---------- */
+const COLS={
+  name:["device","name","computer name","name of computer"],
+  serial:["serial","serial #","serial number"],
+  type:["device type","type"],
+  status:["assignment status","device status","status"],
+  assigned:["currently assigned to","assigned to"],
+  date:["date last assigned","date assigned"],
+  processor:["processor"],
+  cores:["processor cores"],
+  memory:["device memory","memory"],
+  graphics:["device graphics","graphics"],
+  ip:["ip address","ip"],
+  cpu:["cpu"],
+  location:["work location","location"]
+};
+function parseCSV(t){
+  t=t.replace(/^\uFEFF/,"");
+  const rows=[];let r=[],f="",q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===","){r.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;r.push(f);f="";rows.push(r);r=[]}
+    else f+=c;
+  }
+  if(f!==""||r.length){r.push(f);rows.push(r)}
+  return rows.filter(r=>r.some(x=>String(x).trim()!==""));
+}
+function normType(s){
+  const v=s.trim().toLowerCase();if(!v)return"";
+  const hit=TYPES.find(x=>x.toLowerCase()===v);if(hit)return hit;
+  if(/laptop|notebook|macbook/.test(v))return"Laptop";
+  if(/phone|mobile/.test(v))return"Mobile Phone";
+  return"Other";
+}
+function normStatus(s){
+  const v=s.trim().toLowerCase();if(!v)return"";
+  const hit=STATUS.find(x=>x.toLowerCase()===v);if(hit)return hit;
+  if(/stor/.test(v))return"In Storage";
+  if(/repair/.test(v))return"Repair";
+  if(/lost|stolen/.test(v))return"Lost/Stolen";
+  if(/retire/.test(v))return"Retired";
+  if(/assign/.test(v))return"Assigned";
+  return"";
+}
+function normDate(s){
+  s=s.trim();if(!s)return"";
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m)return`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if(m){const y=m[3].length===2?"20"+m[3]:m[3];return`${y}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`}
+  const d=new Date(s);
+  return isNaN(d)?"":`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+const findBySerial=sn=>D.find(d=>String(d.serial||"").trim().toLowerCase()===sn.toLowerCase());
+function buildImport(text,file){
+  const rows=parseCSV(text);
+  if(rows.length<2)return{file,error:"This file has no data rows."};
+  const head=rows[0].map(h=>String(h).trim().toLowerCase()),cols={};
+  for(const k in COLS){const i=head.findIndex(h=>COLS[k].includes(h));if(i>=0)cols[k]=i}
+  if(cols.serial==null)return{file,error:"Couldn’t find a Serial column. The first row must contain the column names."};
+  const get=(r,k)=>cols[k]==null?"":String(r[cols[k]]==null?"":r[cols[k]]).trim();
+  const map=new Map(),skipped=[];let dupes=0;
+  rows.slice(1).forEach((r,i)=>{
+    const serial=get(r,"serial");
+    if(!serial){skipped.push("row "+(i+2)+" has no serial number");return}
+    if(map.has(serial.toLowerCase()))dupes++;
+    map.set(serial.toLowerCase(),{serial,r});
+  });
+  const items=[...map.values()].map(({serial,r})=>{
+    const f={serial};
+    ["name","processor","cores","memory","graphics","ip","cpu","location"].forEach(k=>{const v=get(r,k);if(v)f[k]=v});
+    const t=normType(get(r,"type"));if(t)f.type=t;
+    return{f,status:normStatus(get(r,"status")),assigned:get(r,"assigned"),date:normDate(get(r,"date")),old:findBySerial(serial)};
+  });
+  return{file,items,cols,skipped,dupes};
+}
+function vImport(){
+  const P=IMP;let out="";
+  if(P&&P.error)out=`<div class="warn" style="margin:14px 0 0">${esc(P.file)}: ${esc(P.error)}</div>`;
+  else if(P){
+    const n=P.items.length,nNew=P.items.filter(i=>!i.old).length,known=new Set(E.map(e=>e.name.trim().toLowerCase()));
+    const ne=new Set(P.items.map(i=>i.assigned).filter(a=>a&&!known.has(a.toLowerCase())).map(a=>a.toLowerCase())).size;
+    const sk=P.skipped.length?`${P.skipped.length} row${P.skipped.length===1?"":"s"} skipped (${esc(P.skipped.slice(0,3).join("; "))}${P.skipped.length>3?", …":""}). `:"";
+    const dp=P.dupes?`${P.dupes} duplicate serial${P.dupes===1?"":"s"} found, so the last row for each was used.`:"";
+    out=`<p style="margin:14px 0 6px"><b>${esc(P.file)}</b>: ${n} device${n===1?"":"s"} ready. ${nNew} new, ${n-nNew} will be updated${ne?`, and ${ne} new employee${ne===1?"":"s"} will be added`:""}.</p>`+
+    (sk||dp?`<p class="note" style="margin:0 0 6px">${sk}${dp}</p>`:"")+
+    (n?`<div class="card scroll" style="margin:10px 0 14px"><table><thead><tr><th>Device</th><th>Serial #</th><th>Assigned to</th><th>Result</th></tr></thead><tbody>`+
+      P.items.slice(0,6).map(i=>`<tr><td>${esc(i.f.name||(i.old&&i.old.name)||i.f.serial)}</td><td>${esc(i.f.serial)}</td><td>${esc(i.assigned)||"—"}</td><td>${i.old?'<span class="pill">Update</span>':'<span class="pill ok">New</span>'}</td></tr>`).join("")+
+      `</tbody></table>${n>6?`<div class="pad note">and ${n-6} more</div>`:""}</div>`:"")+
+    (n?`<div class="row"><button class="btn" data-act="doimport">Import ${n} device${n===1?"":"s"}</button><button class="btn sec" data-act="cancelimport">Cancel</button></div>`:"");
+  }
+  return `<h2>Import from CSV</h2><div class="card pad">
+    <p class="note" style="margin:0 0 12px">First row must be column names: Device, Serial, Device type, Assignment status, Currently assigned to, Date last assigned, Processor, Processor Cores, Device Memory, Device graphics, IP address, CPU, Work Location. Devices are matched by serial number, so existing ones are updated and new ones are added. Dates are read as month/day/year.</p>
+    <div class="row"><button class="btn sec" data-act="pickcsv">Choose CSV file</button></div>${out}</div>`;
+}
+async function applyImport(){
+  const P=IMP;if(!P||P.error)return;
+  const byName=new Map(E.map(e=>[e.name.trim().toLowerCase(),e.id]));
+  const empId=n=>{
+    if(!n)return"";const k=n.toLowerCase();
+    if(!byName.has(k)){const id=uid("e");E.push({id,name:n,dept:""});byName.set(k,id)}
+    return byName.get(k)
+  };
+  const hasA=P.cols.assigned!=null;let nNew=0,nUpd=0;
+  for(const it of P.items){
+    const old=findBySerial(it.f.serial);
+    const assignedTo=hasA?empId(it.assigned):(old?old.assignedTo||"":"");
+    let status=it.status||(old?old.status:"")||(assignedTo?"Assigned":"Unassigned");
+    if(assignedTo&&status==="Unassigned")status="Assigned";
+    if(!assignedTo&&status==="Assigned")status="Unassigned";
+    const hist=[...(old&&old.history||[])];
+    if(old&&old.assignedTo&&old.assignedTo!==assignedTo)hist.push({emp:old.assignedTo,from:old.assignedDate||"",to:today()});
+    const same=!!old&&old.assignedTo===assignedTo;
+    const assignedDate=assignedTo?(it.date||(same?old.assignedDate||"":today())):"";
+    if(old){Object.assign(old,it.f,{assignedTo,assignedDate,status,history:hist});nUpd++}
+    else{D.push({id:uid("d"),name:it.f.serial,type:"",os:"",mdm:"No",enrolled:"No",entra:"No",compliance:"Not evaluated",replace:false,notes:"",...it.f,assignedTo,assignedDate,status,history:hist});nNew++}
+  }
+  const done=await persist();
+  if(done){IMP=null;toast(`Imported ${nNew} new, ${nUpd} updated`)}
+  render();
+}
+
+function vDevices(){
+  const tab=V.tab||"assigned",f=FILT[V.f];
+  let list=D.filter(d=>tab==="all"||(tab==="assigned"?d.assignedTo:!d.assignedTo));
+  if(f)list=list.filter(f[1]);
+  list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const tb=(k,l)=>`<button class="${tab===k?"on":""}" data-go="devices:${k}${V.f?":"+V.f:""}">${l}</button>`;
+  return `<div class="row" style="justify-content:space-between"><h1>Devices</h1><button class="btn" data-go="add">Log new device</button></div>
+  <div class="tabs">${tb("assigned","Assigned")}${tb("unassigned","Unassigned")}${tb("all","All")}${f?`<span class="chip">Filter: ${f[0]} <button class="lk" data-go="devices:${tab}">Clear</button></span>`:""}</div>${devTable(list)}`;
+}
+
+function vSearch(){
+  const s=Q.trim().toLowerCase();
+  const ds=D.filter(d=>[d.serial,d.name,d.model,en(d.assignedTo)].some(x=>String(x||"").toLowerCase().includes(s)));
+  const es=E.filter(e=>e.name.toLowerCase().includes(s));
+  return `<h1>Search results</h1><p class="sub">${ds.length} device${ds.length===1?"":"s"} and ${es.length} employee${es.length===1?"":"s"} match “${esc(Q.trim())}”</p>
+  ${es.length?`<h2>Employees</h2>${empTable(es)}`:""}<h2>Devices</h2>${devTable(ds)}`;
+}
+
+function empTable(list){
+  return `<div class="card scroll"><table><thead><tr><th>Name</th><th>Department</th><th>Current devices</th></tr></thead><tbody>`+
+  list.map(e=>`<tr data-go="emp:${e.id}"><td><button class="lk">${esc(e.name)}</button></td><td>${esc(e.dept)}</td><td>${D.filter(d=>d.assignedTo===e.id).length}</td></tr>`).join("")+`</tbody></table></div>`;
+}
+function vEmployees(){
+  return `<div class="row" style="justify-content:space-between"><h1>Employees</h1><button class="btn" data-act="newemp">Add employee</button></div>
+  ${E.length?empTable([...E].sort((a,b)=>a.name.localeCompare(b.name))):'<div class="card empty">No employees yet. Add the people who will receive devices.</div>'}`;
+}
+function vEmp(){
+  const e=emp(V.id);if(!e)return '<div class="empty">Employee not found.</div>';
+  const cur=D.filter(d=>d.assignedTo===e.id),prev=D.filter(d=>d.assignedTo!==e.id&&(d.history||[]).some(h=>h.emp===e.id));
+  return `<button class="lk back" data-go="employees">Back to employees</button><h1>${esc(e.name)}</h1><p class="sub">${esc(e.dept||"No department set")}</p>
+  <h2>Current devices</h2>${cur.length?devTable(cur):'<div class="card empty">No devices assigned.</div>'}
+  <h2>Previous devices</h2>${prev.length?devTable(prev):'<div class="card empty">No previous devices.</div>'}`;
+}
+
+function vDetail(){
+  const d=D.find(x=>x.id===V.id);if(!d)return '<div class="empty">Device not found.</div>';
+  const f=(k,v)=>`<div><dt>${k}</dt><dd>${v===""||v==null?"—":v}</dd></div>`,yn=v=>v||"—";
+  const hist=(d.history||[]).map(h=>`<li><button class="lk" data-go="emp:${h.emp}">${esc(en(h.emp)||"Former employee")}</button>${h.from||h.to?` <span class="chip">${esc(fd(h.from)||"?")} to ${esc(fd(h.to)||"?")}</span>`:""}</li>`).join("");
+  const opts=E.filter(e=>e.id!==d.assignedTo).sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`<option value="${e.id}">${esc(e.name)}${e.dept?" ("+esc(e.dept)+")":""}</option>`).join("");
+  return `<button class="lk back" data-go="devices">Back to devices</button>
+  <div class="row" style="justify-content:space-between"><div><h1>${esc(d.name||"(unnamed)")}</h1><p class="sub">${stPill(d.status)} ${coPill(d.compliance)}</p></div>
+  <div class="row"><button class="btn sec" data-go="edit:${d.id}">Edit device</button>
+  <details class="menu"><summary class="btn">Manage assignment ▾</summary><div class="panel">
+    <label>Reassign to<select id="re"><option value="">Choose employee</option>${opts}</select></label>
+    <button class="btn" data-act="reassign:${d.id}">Reassign device</button>
+    ${d.assignedTo?`<button class="btn dn" data-act="unassign:${d.id}">Unassign and return to IT</button>`:""}
+  </div></details></div></div>
+  <div class="card"><dl>${f("Serial #",esc(d.serial))}${f("Model",esc(d.model))}${f("Device type",esc(d.type))}
+  ${f("Currently assigned to",d.assignedTo?`<button class="lk" data-go="emp:${d.assignedTo}">${esc(en(d.assignedTo))}</button>${d.assignedDate?` <span class="chip">since ${esc(fd(d.assignedDate))}</span>`:""}`:"With IT")}
+  ${f("Last known condition",esc(d.condition))}${f("Purchase date",esc(fd(d.purchaseDate)))}${f("Purchase price",esc(money(d.price)))}
+  ${f("OS name",esc([d.os,d.osVer].filter(Boolean).join(" ")))}${f("MDM hooked up to Intune",yn(d.mdm))}${f("Intune enrolled",yn(d.enrolled))}
+  ${f("Entra joined",yn(d.entra))}${f("Last Intune check-in",esc(fdt(d.checkin)))}${f("Device compliance status",coPill(d.compliance)||"—")}
+  ${f("Needs replacement",d.replace?"Yes":"No")}</dl></div>
+  <h2>Computer specs</h2>
+  <div class="card"><dl>${f("Processor",esc(d.processor))}${f("Processor cores",esc(d.cores))}${f("Device memory",esc(d.memory))}${f("Device graphics",esc(d.graphics))}${f("IP address",esc(d.ip))}${f("CPU",esc(d.cpu))}${f("Work location",esc(d.location))}</dl></div>
+  <h2>Previously assigned to</h2><div class="card pad">${hist?`<ul style="margin:0;padding-left:18px">${hist}</ul>`:"No previous assignments."}</div>
+  <h2>Notes</h2><div class="card pad" style="white-space:pre-wrap">${esc(d.notes)||"No notes."}</div>`;
+}
+
+function vForm(){
+  const d=V.n==="edit"?D.find(x=>x.id===V.id)||{}:{status:"Unassigned",type:"Laptop",os:"Windows 11",mdm:"No",enrolled:"No",entra:"No",compliance:"Not evaluated"};
+  const sel=(n,arr,v,blank)=>{const a=v&&!arr.includes(v)?[...arr,v]:arr;return `<select name="${n}">${blank?'<option value="">'+blank+"</option>":""}${a.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}</select>`};
+  const emps=(n,v,blank)=>`<select name="${n}"><option value="">${blank}</option>${[...E].sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`<option value="${e.id}" ${e.id===v?"selected":""}>${esc(e.name)}${e.dept?" ("+esc(e.dept)+")":""}</option>`).join("")}</select>`;
+  const inp=(l,n,t,v,x)=>`<label>${l}<input name="${n}" type="${t||"text"}" value="${esc(v)}" ${x||""}></label>`;
+  return `<button class="lk back" data-go="${V.n==="edit"?"detail:"+V.id:"devices"}">Cancel</button><h1>${V.n==="edit"?"Edit device":"Log new device"}</h1><p class="sub">Computer name and serial number are required.</p>
+  <form id="df" class="card pad"><div class="grid">
+  ${inp("Name of computer","name","",d.name,"required")}${inp("Serial #","serial","",d.serial,"required")}${inp("Model","model","",d.model)}
+  <label>Device type${sel("type",TYPES,d.type)}</label><label>Device status${sel("status",STATUS,d.status)}</label>
+  <label>Currently assigned to${emps("assignedTo",d.assignedTo,"Unassigned (with IT)")}</label>${inp("Date assigned","assignedDate","date",d.assignedDate)}
+  <label>Last known condition${sel("condition",COND,d.condition,"Not recorded")}</label>
+  ${inp("Purchase date","purchaseDate","date",d.purchaseDate)}${inp("Purchase price (USD)","price","number",d.price,'step="0.01" min="0"')}
+  ${inp("OS name","os","",d.os)}${inp("OS version","osVer","",d.osVer)}
+  <label>MDM hooked up to Intune${sel("mdm",["Yes","No"],d.mdm)}</label><label>Intune enrolled${sel("enrolled",["Yes","No"],d.enrolled)}</label>
+  <label>Entra joined${sel("entra",["Yes","No"],d.entra)}</label>${inp("Last Intune check-in","checkin","datetime-local",d.checkin)}
+  <label>Device compliance status${sel("compliance",COMP,d.compliance)}</label>
+  <label class="ck" style="align-self:end;padding-bottom:10px"><input type="checkbox" name="replace" ${d.replace?"checked":""}>Needs replacement</label>
+  <h2 class="full" style="margin:10px 0 0">Computer Specs</h2>
+  ${inp("Processor","processor","",d.processor)}${inp("Processor cores","cores","",d.cores)}${inp("Device memory","memory","",d.memory)}
+  ${inp("Device graphics","graphics","",d.graphics)}${inp("IP address","ip","",d.ip)}${inp("CPU","cpu","",d.cpu)}${inp("Work location","location","",d.location)}
+  <label class="full">Notes<textarea name="notes" rows="4">${esc(d.notes)}</textarea></label></div>
+  <div class="row" style="margin-top:18px"><button class="btn" type="submit">Save device</button></div></form>`;
+}
+
+async function saveDevice(f){
+  const raw=Object.fromEntries(new FormData(f)),old=V.n==="edit"?D.find(x=>x.id===V.id):null,id=old?old.id:uid("d");
+  const hist=[...(old&&old.history||[])];
+  if(old&&old.assignedTo&&old.assignedTo!==raw.assignedTo)hist.push({emp:old.assignedTo,from:old.assignedDate||"",to:today()});
+  let status=raw.status;if(raw.assignedTo&&status==="Unassigned")status="Assigned";if(!raw.assignedTo&&status==="Assigned")status="Unassigned";
+  const assignedDate=raw.assignedTo?(raw.assignedDate||today()):"";
+  const doc={...raw,status,assignedDate,price:raw.price===""?"":Number(raw.price),replace:raw.replace==="on",history:hist};
+  if(await put("devices",id,doc,false)){toast("Device saved");go("detail",{id})}
+}
+async function reassign(id){
+  const to=$("#re").value,d=D.find(x=>x.id===id);if(!to){toast("Choose an employee first");return}
+  const h=[...(d.history||[])];if(d.assignedTo)h.push({emp:d.assignedTo,from:d.assignedDate||"",to:today()});
+  if(await put("devices",id,{assignedTo:to,assignedDate:today(),status:"Assigned",history:h},true))toast("Device reassigned to "+en(to))
+}
+async function unassign(id){
+  const d=D.find(x=>x.id===id),h=[...(d.history||[])];if(d.assignedTo)h.push({emp:d.assignedTo,from:d.assignedDate||"",to:today()});
+  if(await put("devices",id,{assignedTo:"",assignedDate:"",status:"Unassigned",history:h},true))toast("Device unassigned and returned to IT")
+}
+
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-act]");
+  if(a){const[k,id]=a.dataset.act.split(":");
+    if(k==="newemp"){$("#ef").reset();$("#ed").showModal()}
+    if(k==="reassign")reassign(id);
+    if(k==="unassign")unassign(id);
+    if(k==="pickcsv")$("#csv").click();
+    if(k==="doimport")applyImport();
+    if(k==="cancelimport"){IMP=null;render()}
+    return}
+  const g=e.target.closest("[data-go]");
+  if(g){const[n,x,y]=g.dataset.go.split(":");
+    if(n==="devices")go("devices",{tab:x,f:y});else if(n==="detail"||n==="edit"||n==="emp")go(n,{id:x});else go(n);
+    if(n!=="search")$("#q").value="",Q=""}
+});
+document.addEventListener("submit",e=>{if(e.target.id==="df"){e.preventDefault();saveDevice(e.target)}});
+$("#csv").addEventListener("change",async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{IMP=buildImport(await f.text(),f.name)}catch(x){IMP={file:f.name,error:"Couldn’t read this file."}}
+  render()
+});
+$("#q").addEventListener("input",e=>{Q=e.target.value;if(Q.trim())go("search");else go("home")});
+$("#ecancel").onclick=()=>$("#ed").close();
+$("#ef").addEventListener("submit",async e=>{
+  e.preventDefault();const f=new FormData(e.target),rows=[];
+  const name=(f.get("name")||"").trim();if(name)rows.push([name,(f.get("dept")||"").trim()]);
+  (f.get("bulk")||"").split("\n").forEach(l=>{const p=l.split(",");const n=p[0].trim();if(n)rows.push([n,p.slice(1).join(",").trim()])});
+  if(!rows.length){toast("Enter at least one name");return}
+  for(const[n,d]of rows)await put("employees",uid("e"),{name:n,dept:d},false);
+  $("#ed").close();toast(rows.length+" employee"+(rows.length===1?"":"s")+" added")
+});
+
+/* ---------- login: sign out + admin-only Users link ---------- */
+$("#signout").onclick=async()=>{try{await fetch("/logout",{method:"POST"})}catch(e){}location="/login"};
+fetch("/api/me").then(r=>r.ok?r.json():null).then(m=>{if(m&&m.role==="admin")$("#usersLink").hidden=false}).catch(()=>{});
+
+render();
+async function load(){
+  try{
+    const r=await fetch("/api/data");
+    if(r.status===401){location="/login";return}
+    if(!r.ok)throw 0;
+    const j=await r.json();
+    if(JSON.stringify([j.employees,j.devices])!==JSON.stringify([E,D])){E=j.employees||[];D=j.devices||[];ok=true;ready=true;render()}
+    else if(!ready||!ok){ok=true;ready=true;render()}
+  }catch(e){ok=false;ready=true;render()}
+}
+load();setInterval(load,15000);
+</script></body></html>

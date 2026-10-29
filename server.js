@@ -196,7 +196,7 @@ http.createServer(async (req, res) => {
       }
     }
 
-    if (p === "/" || p === "/index.html") return html(200, fs.readFileSync(path.join(__dirname, "index.html")));
+    if (p === "/" || p === "/index1.html") return html(200, fs.readFileSync(path.join(__dirname, "index1.html")));
     text(404, "Not found");
   } catch (e) {
     try { text(400, "bad request"); } catch {}

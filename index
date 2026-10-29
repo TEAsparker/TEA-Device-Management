@@ -123,7 +123,7 @@ function render(){
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===V.n||(V.n==="detail"||V.n==="add"||V.n==="edit")&&b.dataset.go==="devices"||V.n==="emp"&&b.dataset.go==="employees"));
   $("#depts").innerHTML=[...new Set(E.map(e=>e.dept).filter(Boolean))].map(d=>`<option value="${esc(d)}">`).join("");
   const m=$("#m");
-  m.innerHTML=(ok||!ready?"":'<div class="warn">Can’t reach the server, so changes are not being saved. Start it with <b>node server.js</b> and open http://localhost:3000.</div>')+
+  m.innerHTML=
     (V.n==="search"?vSearch():V.n==="devices"?vDevices():V.n==="employees"?vEmployees():V.n==="emp"?vEmp():V.n==="detail"?vDetail():V.n==="add"||V.n==="edit"?vForm():vHome());
 }
 
